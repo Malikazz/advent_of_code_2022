@@ -21,6 +21,7 @@ fn problem_02(){
         }
         plays.push(tempVec);
     }
+    // I assumed part two was gonna be hard but I probably dont need the extra loop
     for play in plays.iter(){
         // A X == Rock  == 1 
         // B Y == Papper == 2 
