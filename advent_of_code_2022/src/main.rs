@@ -10,7 +10,7 @@ fn main() {
 
 fn problem_03() {
     let data: String = load_string("src/assets/problem_03.txt");
-    let mut ruck: Vec<Vec<&str>> = Vec::new();
+    let mut ruck: Vec<&str> = Vec::new();
     let mut points: i32 = 0;
     let point_map: HashMap<String, i32> = HashMap::from([
         (String::from("a"), 1),
@@ -69,20 +69,19 @@ fn problem_03() {
     // all) items should only be in one side
 
     for line in data.split("\n") {
-        let mut temp: Vec<&str> = Vec::new();
-        temp.push(&line[0..line.len() / 2]);
-        temp.push(&line[line.len() / 2..]);
-        ruck.push(temp);
+        ruck.push(line);
     }
     // find the duplicate item
     // stupid solution is just check everything
-    let mut found: bool = false;
-    for bags in ruck.windows(3) {
-        for bag in bags.iter(){
-            
+    for bags in ruck.windows(3).step_by(3) {
+        for item in bags[0].chars(){
+            if bags[1].contains(item) && bags[2].contains(item) {
+                points = points + point_map[&String::from(item)];
+                break;
+            }
         }
     }
-    print!("{:?}", points)
+    print!("{:?}\n", points)
 }
 
 fn problem_02() {
