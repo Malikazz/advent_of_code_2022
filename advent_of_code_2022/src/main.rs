@@ -5,7 +5,41 @@ use std::io::prelude::*;
 fn main() {
     //problem_01();
     //problem_02();
-    problem_03()
+    //problem_03()
+    problem_04();
+}
+
+fn problem_04() {
+    let data: String = load_string("src/assets/problem_04");
+    let mut pairs: Vec<Vec<i32>> = Vec::new(); 
+
+    let mut count: i32 = 0;
+    // How often does a pair fully containt the other
+    for line in data.split("\n"){
+        for pair in line.split(","){
+            let mut temp: Vec<i32> = Vec::new();
+            for side in pair.split("-"){
+                temp.push(side.parse::<i32>().unwrap())
+            }
+            pairs.push(temp);
+        }
+    }
+
+    for elf_pairs in pairs.windows(2).step_by(2){
+        let start1 = elf_pairs[0][0];
+        let start2 = elf_pairs[1][0];
+        let end1 = elf_pairs[0][1];
+        let end2 = elf_pairs[1][1];
+
+        if start1 > end2 || start2 > end1 {
+            count = count + 1;
+        }
+    }
+    print!("{:?}\n", ((pairs.len() / 2)  as i32) - count)
+
+}
+fn IsValueInPair(value: i32, pair: &Vec<i32>) -> bool{
+    value >= pair[0] && value <= pair[1]
 }
 
 fn problem_03() {
@@ -92,12 +126,12 @@ fn problem_02() {
 
     for values in data.split("\n") {
         let temp = values;
-        let mut tempVec: Vec<&str> = Vec::new();
+        let mut temp_vec: Vec<&str> = Vec::new();
 
         for item in temp.split(" ") {
-            tempVec.push(item);
+            temp_vec.push(item);
         }
-        plays.push(tempVec);
+        plays.push(temp_vec);
     }
     // I assumed part two was gonna be hard but I probably dont need the extra loop
     for play in plays.iter() {
