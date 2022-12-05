@@ -67,10 +67,13 @@ fn problem_05() {
 
     for command in commands{
         // move using len and command numbers
+        let mut to_move = stacks[command.from][(stacks[command.from].len() - command.move_count)..stacks[command.from].len()].to_vec();
+        stacks[command.too].append(to_move.as_mut());
+
         for _i in 0..command.move_count{
-            let to_move = stacks[command.from].pop().unwrap();
-            stacks[command.too].push(to_move);
+            stacks[command.from].pop();
         }
+        
     }
 
     for stack in stacks{
