@@ -3,10 +3,80 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
+    problem_05();
     //problem_01();
     //problem_02();
     //problem_03()
-    problem_04();
+    //problem_04();
+}
+
+#[derive(Debug)]
+struct Problem5Command{
+    move_count:usize,
+    from:usize,
+    too:usize
+}
+
+
+impl Problem5Command{
+   pub fn new() -> Self{
+        Self {move_count: 0, from: 0, too: 0}
+    }
+}
+fn problem_05() {
+    let data: String = load_string("src/assets/problem_05");
+    let mut commands: Vec<Problem5Command> = Vec::new();
+    let mut answer:String  = String::from("");
+    // is a stack probably
+    //[C]         [S] [H]                
+    //[F] [B]     [C] [S]     [W]        
+    //[B] [W]     [W] [M] [S] [B]        
+    //[L] [H] [G] [L] [P] [F] [Q]        
+    //[D] [P] [J] [F] [T] [G] [M] [T]    
+    //[P] [G] [B] [N] [L] [W] [P] [W] [R]
+    //[Z] [V] [W] [J] [J] [C] [T] [S] [C]
+    //[S] [N] [F] [G] [W] [B] [H] [F] [N]
+    // 1   2   3   4   5   6   7   8   9 
+
+    let mut stacks: Vec<Vec<&str>> = vec![
+        vec!["C","F","B","L","D","P","Z","S"],
+        vec!["B","W","H","P","G","V","N"],
+        vec!["G","J","B","W","F"],
+        vec!["S","C","W","L","F","N","J","G"],
+        vec!["H","S","M","P","T","L","J","W"],
+        vec!["S","F","G","W","C","B"],
+        vec!["W","B","Q","M","P","T","H"],
+        vec!["T","W","S","F"],
+        vec!["R","C","N"]];
+    for stack in stacks.iter_mut(){
+        stack.reverse();
+    }
+    for command in data.split("\n"){
+        // remove all the text
+        let mut numbers = command.replace("move","").replace("from", ",").replace("to",",").replace(" ", "");        
+        let numbers_split = numbers.split(",").collect::<Vec<&str>>();
+
+        print!("{:?}\n", numbers_split);
+        let mut temp_command = Problem5Command::new();
+        temp_command.move_count = numbers_split[0].parse::<usize>().unwrap();
+        temp_command.from = numbers_split[1].parse::<usize>().unwrap() - 1 ;
+        temp_command.too = numbers_split[2].parse::<usize>().unwrap() - 1 ;
+
+        commands.push(temp_command);
+    }
+
+    for command in commands{
+        // move using len and command numbers
+        for _i in 0..command.move_count{
+            let to_move = stacks[command.from].pop().unwrap();
+            stacks[command.too].push(to_move);
+        }
+    }
+
+    for stack in stacks{
+        answer.push_str(stack[stack.len()-1]);
+    }
+    print!("Problems 5 answer: {:?}\n", answer)
 }
 
 fn problem_04() {
@@ -37,9 +107,6 @@ fn problem_04() {
     }
     print!("{:?}\n", ((pairs.len() / 2)  as i32) - count)
 
-}
-fn IsValueInPair(value: i32, pair: &Vec<i32>) -> bool{
-    value >= pair[0] && value <= pair[1]
 }
 
 fn problem_03() {
