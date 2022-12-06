@@ -1,14 +1,41 @@
+use std::collections::HashSet;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
+use std::ops::Index;
 
 fn main() {
+    problem_06();
     problem_05();
-    //problem_01();
     //problem_02();
-    //problem_03()
+    //problem_03();
     //problem_04();
+    //problem_01();
+    
+    
+    
 }
+
+fn problem_06(){
+    let data: String = load_string("src/assets/problem_06");
+    let mut count: usize = 4;
+
+    for item in data.as_bytes().to_vec().windows(4){
+        let mut temp: HashSet<u8> = HashSet::new();
+        temp.insert(item[0]);
+        temp.insert(item[1]);
+        temp.insert(item[2]);
+        temp.insert(item[3]);
+        
+        if temp.len() == 4 {
+            break;
+        }
+        count = count + 1;
+    }
+
+    print!("Problems 6 answer: {:?}\n", count)
+}
+
 
 #[derive(Debug)]
 struct Problem5Command{
@@ -56,7 +83,6 @@ fn problem_05() {
         let mut numbers = command.replace("move","").replace("from", ",").replace("to",",").replace(" ", "");        
         let numbers_split = numbers.split(",").collect::<Vec<&str>>();
 
-        print!("{:?}\n", numbers_split);
         let mut temp_command = Problem5Command::new();
         temp_command.move_count = numbers_split[0].parse::<usize>().unwrap();
         temp_command.from = numbers_split[1].parse::<usize>().unwrap() - 1 ;
