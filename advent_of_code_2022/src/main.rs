@@ -22,7 +22,7 @@ struct FileNode {
     parent: usize,
     value: String,
     size: usize,
-    children: Vec<usize>
+    children: HashSet<usize>
 }
 
 fn problem_07(){
@@ -33,21 +33,19 @@ fn problem_07(){
     let mut current_position: usize = 0;
 
     for line in data.split("\n"){
-        if line.contains("cd") {
+        if line.contains("$ cd") {
             if line.contains(".."){
                 current_position = my_vec[current_position].parent;
                 continue;
             }else {
-                let line = line.replace("$ cd", "");
-                let line = line.trim();
-                my_vec.push(FileNode{parent:current_position, size:0, value:String::from(line), children: Vec::new()});
+                my_vec.push(FileNode{parent:current_position, size:0, value:String::from(line), children: HashSet::new()});
                 current_position = my_vec.len() -1;
                 continue;
             }
             
         }
-        if line.contains("dir") {
-            my_vec.push(FileNode{parent:current_position, size:0, value:String::from(line), children: Vec::new()});
+        if line.contains("dir ") {
+            my_vec.push(FileNode{parent:current_position, size:0, value:String::from(line), children: HashSet::new()});
             continue;
         }
         if line == "$ ls" {
@@ -58,18 +56,21 @@ fn problem_07(){
         for child_part in line.split(" ") {
             temp_child.push(child_part);
         }
-        my_vec.push(FileNode { parent: current_position, value:String::from(temp_child[1]), size: temp_child[0].parse::<usize>().unwrap(), children: Vec::new() });
+        my_vec.push(FileNode { parent: current_position, value:String::from(temp_child[1]), size: temp_child[0].parse::<usize>().unwrap(), children: HashSet::new() });
         
         let current_len = my_vec.len();
         
-        my_vec[current_position].children.push(current_len -1)
+        my_vec[current_position].children.insert(current_len -1);
     }
     // fix children
 
     for item in 0..my_vec.len(){
         let parent = my_vec[item].parent;
         let mut children = my_vec[item].children.clone();
-        my_vec[parent].children.append(&mut children);
+        for inner_child in children{
+            my_vec[parent].children.insert(inner_child);
+        }
+        
     }
     
 
