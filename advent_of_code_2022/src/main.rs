@@ -32,6 +32,8 @@ fn problem_07(){
 
     let mut current_position: usize = 0;
 
+    my_vec.push(FileNode{parent:usize::MAX as usize, size:0, value:String::from("ROOT"), children: HashSet::new()});
+
     for line in data.split("\n"){
         if line.contains("$ cd") {
             if line.contains(".."){
@@ -45,7 +47,7 @@ fn problem_07(){
             
         }
         if line.contains("dir ") {
-            my_vec.push(FileNode{parent:current_position, size:0, value:String::from(line), children: HashSet::new()});
+            //my_vec.push(FileNode{parent:current_position, size:0, value:String::from(line), children: HashSet::new()});
             continue;
         }
         if line == "$ ls" {
@@ -65,30 +67,35 @@ fn problem_07(){
     // fix children
 
     for item in 0..my_vec.len(){
-        let parent = my_vec[item].parent;
-        let mut children = my_vec[item].children.clone();
-        for inner_child in children{
-            my_vec[parent].children.insert(inner_child);
+        let mut parent = my_vec[item].parent;
+        while parent != usize::MAX{
+            let mut children = my_vec[item].children.clone();
+            for inner_child in children{
+                my_vec[parent].children.insert(inner_child);
+            }
+            parent = my_vec[parent].parent;
         }
+        
         
     }
     
-
-    for item in my_vec.iter(){
-        if item.children.len() > 0 {
+    for item in 0..my_vec.len(){
+        if my_vec[item].children.len() > 0 {
             let mut temp_size: usize = 0;
-            for child in item.children.iter(){
+            for child in my_vec[item].children.iter(){
                  temp_size = temp_size + my_vec[*child].size;
             }
-            if temp_size < 100_001 {
-                answer = answer + temp_size;
-            }
+            my_vec[item].size = temp_size;
         }
     }
+    let mut the_dir: &FileNode = &FileNode { parent: usize::MAX, value:String::from("fake"), size: usize::MAX, children: HashSet::new() };
     for item in my_vec.iter(){
-        print!("{:?}\n", item)
+        if item.size >= 6_975_962 && item.size < the_dir.size{
+            the_dir = item;
+        }
     }
-    print!("Problems 7 answer: {:?}\n", answer)
+    // 23024038
+    print!("Problems 7 answer: {:?}\n", the_dir)
     
 }
 
