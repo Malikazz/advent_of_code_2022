@@ -35,15 +35,17 @@ enum Operation{
 }
 
 pub fn problem_11() {
-    let data = &read_to_string("src/assets/problem_11_test.yaml").unwrap();
+    let data = &read_to_string("src/assets/problem_11").unwrap();
 
     let mut monkeys: Vec<Monkey> = Vec::new();
     
     let mut temp_monkey = Monkey {
         items: Vec::new(),
-        test: 0,
-        if_true: 0,
-        if_false: 0,
+                operation: Operation::add,
+                opertaion_value: 0,
+                test: 0,
+                if_true: 0,
+                if_false: 0,
     };
 
     for line in data.split("\n") {
@@ -51,7 +53,8 @@ pub fn problem_11() {
             monkeys.push(temp_monkey);
             temp_monkey = Monkey {
                 items: Vec::new(),
-                operation: String::from(""),
+                operation: Operation::add,
+                opertaion_value: 0,
                 test: 0,
                 if_true: 0,
                 if_false: 0,
@@ -59,9 +62,40 @@ pub fn problem_11() {
         } else if line == "" {
             continue;
         }
-        
+        if line.contains("Starting items") {
+            let line = line.replace(",", "");
+            let line = line.replace("Starting items: ", "");
+            for sub_line in line.split(" "){
+                temp_monkey.items.push(sub_line.parse::<i32>().unwrap());
+            }
+
+        }
+        else if line.contains("Operation") {
+            let line = line.replace("Operation: new = old ", "");
+            for sub_item in line.split(" "){
+                match sub_item {
+                    "+" => temp_monkey.operation = Operation::add,
+                    "-" => temp_monkey.operation = Operation::subtract,
+                    "*" => temp_monkey.operation = Operation::multiply,
+                    "/" => temp_monkey.operation = Operation::divide,
+                    _ => temp_monkey.opertaion_value = sub_item.parse().unwrap()
+                }
+            }
+        }
+        else if line.contains("Test") {
+            let line = line.replace("Test: divisible by ", "");
+            temp_monkey.test = line.parse().unwrap();
+        }
+        else if line.contains("If true") {
+            let line = line.replace("If true: throw to monkey ", "");
+            temp_monkey.if_true = line.parse().unwrap();
+        }
+        else if line.contains("If false") {
+            let line = line.replace("If false: throw to monkey ", "");
+            temp_monkey.if_false = line.parse().unwrap();
+        }
 
     }
 
-    print!("Problem 11: {:?}\n\n", data)
+    print!("Problem 11: {:?}\n\n", monkeys)
 }
