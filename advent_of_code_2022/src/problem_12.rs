@@ -1,74 +1,137 @@
-use std::fs::read_to_string;
-pub fn problem_12() {
-    
-    const UP:i32 = -1;
-    const Down:i32 = 1;
-    const Right:i32 = 1;
-    const Left:i32 = -1;
-    
-    let start_label: u8 = "S".as_bytes()[0];
-    let end_label: u8 = "E".as_bytes()[0];
-    let mut start_point: Point = Point::new(0,0);
-    let mut end_point: Point = Point::new(0,0);
-    
-    let data: String = read_to_string("src/assets/problem_12_test").unwrap();
-    
-    // u8 should allow for easy math in the path finding
-    let mut mountain_map: Vec<Vec<u8>> = parse(&data);
-    let mut closed_points: Vec<Point> = Vec::new();
+use std::{
+    cmp::Ordering,
+    collections::{BinaryHeap, HashSet},
+};
 
-    // find start and end
-    for row in 0..mountain_map.len(){
-        for col in 0..mountain_map[row].len(){
-            if mountain_map[row][col] == start_label {
-                start_point.col = col; start_point.row = row;
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+struct Coord {
+    x: usize,
+    y: usize,
+}
+
+#[derive(PartialEq, Eq, Clone, Copy)]
+struct Node {
+    cost: u32,
+    coord: Coord,
+}
+
+impl Ord for Node {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.cost.cmp(&self.cost)
+    }
+}
+
+impl PartialOrd for Node {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Coord {
+    fn neighbours(&self, rows: usize, cols: usize) -> Vec<Self> {
+        let mut result = Vec::new();
+
+        // up
+        if self.y > 0 {
+            result.push(Self {
+                x: self.x,
+                y: self.y - 1,
+            });
+        }
+        // down
+        if self.y < rows - 1 {
+            result.push(Self {
+                x: self.x,
+                y: self.y + 1,
+            });
+        }
+        // left
+        if self.x > 0 {
+            result.push(Self {
+                x: self.x - 1,
+                y: self.y,
+            });
+        }
+        // right
+        if self.x < cols - 1 {
+            result.push(Self {
+                x: self.x + 1,
+                y: self.y,
+            });
+        }
+
+        result
+    }
+}
+
+fn parse() -> (Coord, Coord, Vec<Vec<u8>>, usize, usize) {
+    let input = std::fs::read_to_string("src/assets/problem_12").unwrap();
+    let rows = input.lines().count();
+    let cols = input.lines().next().unwrap().len();
+    let mut map = vec![vec![0; cols]; rows];
+    let mut start = Coord { x: 0, y: 0 };
+    let mut end = Coord { x: 0, y: 0 };
+
+    for (row, line) in input.lines().enumerate() {
+        for (col, c) in line.chars().enumerate() {
+            let letter = match c {
+                'S' => {
+                    start.x = col;
+                    start.y = row;
+                    'a'
+                }
+                'E' => {
+                    end.x = col;
+                    end.y = row;
+                    'z'
+                }
+                'a'..='z' => c,
+                _ => panic!("Invalid input"),
+            };
+
+            let val = letter as u8 - b'a';
+            map[row][col] = val;
+        }
+    }
+
+    (start, end, map, rows, cols)
+}
+
+pub fn problem_12(){
+    let (start, end, map, rows, cols) = parse();
+    let mut pq = BinaryHeap::new();
+    let mut visited = HashSet::new();
+
+    pq.push(Node {
+        cost: 0,
+        coord: end,
+    });
+    visited.insert(start);
+
+    while let Some(Node { coord, cost }) = pq.pop() {
+        let curr_height = map[coord.y][coord.x];
+
+        if curr_height == 0 {
+            print!("Problem 12: {:?}\n\n", cost);
+            return
+        }
+
+        let neighbours = coord.neighbours(rows, cols);
+        let candidates: Vec<_> = neighbours
+            .iter()
+            .filter(|coord| {
+                let height = map[coord.y][coord.x];
+                height >= curr_height || height == curr_height - 1
+            })
+            .collect();
+
+        for candidate in candidates {
+            if visited.insert(*candidate) {
+                pq.push(Node {
+                    cost: cost + 1,
+                    coord: *candidate,
+                })
             }
-            else if mountain_map[row][col] == end_label {
-                end_point.col = col; end_point.row = row;
-            }   
         }
-    }
-
-    print!("start:{:?} end:{:?}\n", start_point, end_point);
-
-    // only step up one level, down as many as we want
-    loop {
-
-        break;
-    }
-
-
-
-
-
-    print!("Problem 12: {:?}\n\n", mountain_map)
-}
-
-fn parse(data: &String) -> Vec<Vec<u8>>{
-    let mut mountain_map: Vec<Vec<u8>> = Vec::new();
-
-    for line in data.split("\n") {
-        let mut temp: Vec<u8> = Vec::new();
-        for char in line.bytes() {
-            temp.push(char);
-        }
-        mountain_map.push(temp);
-    }
-    mountain_map
-}
-
-fn find_point_value(point: Point, starting_point: Point, ending_point:Point) {
-    
-}
-
-#[derive(Debug)]
-struct Point{
-    row: usize,
-    col: usize,
-}
-
-impl Point {
-    fn new(row: usize, col:usize) -> Point{
-        Point {row:row, col: col}
     }
 }
