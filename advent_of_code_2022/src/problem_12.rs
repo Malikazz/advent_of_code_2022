@@ -1,3 +1,6 @@
+// Could not get this one correct so found some code to learn from 
+// credit https://dev.to/nickymeuleman/advent-of-code-2022-day-12-4cc9
+
 use std::{
     cmp::Ordering,
     collections::{BinaryHeap, HashSet},
