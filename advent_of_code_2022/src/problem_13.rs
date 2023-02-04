@@ -8,7 +8,10 @@ pub fn problem_13() {
 
     // if one value is int and other is list convert int to list
 
-
-
     print!("Problem 13: {:?}\n\n", data)
+}
+
+struct Packet {
+    value: Option<i32>,
+    lists: Vec<Packet>
 }

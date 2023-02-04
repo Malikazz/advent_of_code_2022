@@ -11,6 +11,8 @@ pub mod problem_10;
 pub mod problem_11;
 pub mod problem_12;
 pub mod problem_13;
+pub mod problem_14;
+pub mod problem_25;
 
 
 fn main() {
@@ -27,4 +29,6 @@ fn main() {
     problem_11::problem_11();
     problem_12::problem_12();
     problem_13::problem_13();
+    problem_14::problem_14();
+    problem_25::problem_25();
 }
